@@ -34,8 +34,8 @@ class Solution {
         return res;
     } */
     //method 2 dp + 剪枝
-    //剪枝须知：1，若将待选数组平分为2，则若准备的钱的数额能够cover右边较大的数的话，那么同样的数额必然能cover掉右半部分的cost
-               //因为左右两边数量相等的话，选择步骤是一样的，但对每一步选择来说，左边的cost都比右边的多
+    //剪枝须知：1，若将待选数组平分为2，则若准备的钱的数额能够cover右边较大的数的话，那么同样的数额必然能cover掉左半部分的cost
+               //因为左右两边数量相等的话，选择步骤是一样的，但对每一步选择来说，右边的cost都比左边的多
     public int getMoneyAmount(int n) {
         int[][] dp = new int[n + 1][n + 1];
         return dfs(dp, 1, n);
