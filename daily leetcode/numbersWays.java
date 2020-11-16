@@ -33,7 +33,7 @@ class Solution {
                 for (int people: h[i]) {
                     int index = 1 << people; 
                     //if he has weared this hat
-                    if ((j & index) > 0) {
+                    if ((j & index) > 0) {//背包问题两种状态：对于此人戴了帽子，此时的总ways数量为：此人戴了帽子的ways+此人没戴帽子的ways
                         dp[i+1][j] = (dp[i+1][j] + dp[i][j^index]) % M;
                     }
                 }
