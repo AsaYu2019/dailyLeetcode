@@ -1,73 +1,43 @@
 class Solution {
-    /* 普通DFS，超时
-    int sum;
-    int n;
+    int len;
     public boolean splitArraySameAverage(int[] A) {
-        n = A.length;
-        if(n == 2) return A[0] == A[1];
-        sum = 0;
-        Arrays.sort(A); //排序一次，方便实施剪枝
+        this.len = A.length;
+        if(len == 1) return false;
+        int sum = 0;
         for(int num : A){
             sum += num;
         }
-        
-        return DFS(A, 0, 0, 0);
-    }
-    
-    private boolean DFS(int[] A, int curSum, int curNum, int index){
-        // curSum/curNum = sum/n时，即能找到
-        if(curNum > 0 && curNum < n && curSum * n == sum * curNum) return true; 
-        //找到最后一个了也没成功
-        if(index == n) return false;
-        
-        //剪枝2：如果现有的平均值已经超过了目标平均值，之后的元素又越来越大，故之后的就不用考虑了
-        if(curSum * n > sum * curNum) return false;
-        
-        //对于index处元素，两种情况：
-        //case1: 将A【index】选入B，递归下去能true则return true
-        if(DFS(A, curSum + A[index], curNum + 1, index + 1)) return true;
-        
-        //case2: 将A[index] 不选入B，递归下去能true，则return true;
-        //剪枝1：不选的时候，如果有重复数字，直接跳过该重复数字,下次进入dfs时直接在i处进入
-        int i = index + 1;
-        while(i < n && A[i] == A[index]) i++;
-        
-        if(DFS(A, curSum, curNum, i )) return true;
-        //case3: 将A[index] 选不选入都是false，return false;
-        return false;
-    } */
-    
-    //观察： sum/n = curSum/curNum ==> sum * curNum == curSum * n
-    //即：找出curNum个数，使其与sum的乘机等于其和curSum与总个数n的乘积
-    int sum;
-    int n;
-    public boolean splitArraySameAverage(int[] A) {
-        n = A.length;
-        if(n == 2) return A[0] == A[1];
-        sum = 0;
-        Arrays.sort(A); //排序一次，方便实施剪枝
-        for(int num : A){
-            sum += num;
+        Arrays.sort(A);
+        //why not use target = sum / len? because it probably couldn't be divide exactly,so we need to find a method to eliminate this kind of situation
+        //but how? thik about that: sumB/lenB == sumC/lenC ==> Sum/len = sumC/lenC,
+        //so that sumC== sumB == Sum * lenC / len,
+        //and sumC and sumB must be a Integer, 
+        //which means if Sum * lenC % len != 0, we don't use it as our target.
+        //Now Sum is immutable, len is immutable, only lenC means how many elements we need to add to the subset, it could be 1 to len - 1, so we can do some pruning
+        for(int lenB = 1; lenB < len - 1; lenB++){
+            if(sum * lenB % len != 0) continue; //pruning, ensure sumB must be an integer;
+            int sumB = sum * lenB / len;
+            //if we can find a subset, return true
+            if(dfs(A, sumB, lenB, 0)) return true;
         }
-        for(int curNum = 1; curNum < n; curNum++){
-            if(sum * curNum % n != 0) continue; // 不能被n整除，则排除在外
-            int curSum = sum * curNum / n;
-            if(DFS(A, curNum, curSum, 0)) return true;
-        }
-        
+        //we couldn't find a subset
         return false;
     }
-    
-    private boolean DFS(int[] A, int curNum, int curSum, int index){
-        if(curNum == 0 && curSum == 0) return true;
-        if(curNum == 0 || curSum == 0) return false;
-        if(index == n) return false;
+    private boolean dfs(int[] A, int sumB, int lenB, int index){
+        //when we find one subset? based on this subset B, we make sumB and lenB as our targets to find all elements of B, so if sumB and lenB equal 0 at the same time, we find one
+        if(sumB == 0 && lenB == 0) return true;
+        //if only one arrived 0, return false
+        if(sumB == 0 || lenB == 0) return false;
+        //or after scaning all the elements, we couldn't find a right subset
+        if(index == len) return false;
         
-        if(DFS(A, curNum -1, curSum - A[index], index + 1)) return true;
-        //剪枝1：不选的时候，如果有重复数字，直接跳过该重复数字,下次进入dfs时直接在i处进入
-        int i = index + 1;
-        while(i < n && A[i] == A[index]) i++;
-        if(DFS(A, curNum, curSum, i)) return true;
+        //case 1: if the element of index can be choosen and can find a subset in the after
+        if(dfs(A, sumB- A[index], lenB - 1, index + 1)) return true;
+        //case 2, the element of index could not be choosen to subset B
+        //tips, if A[index] == A[index + 1], means A[index + 1] couldn't be choosen too
+        int i = index;
+        while(i < len && A[i] == A[index]) i++;
+        if(dfs(A, sumB, lenB, i))return true;
         return false;
     }
 }
