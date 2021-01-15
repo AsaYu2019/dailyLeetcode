@@ -42,7 +42,7 @@ class Solution {
         }
         return res == Double.POSITIVE_INFINITY ? -1 : (int)res;
     }*/
-    //
+    //build graph matrix, find closest point from the rest, update its distance to closest;
     public int networkDelayTime(int[][] times, int n, int k) {
         //build direct graph matrix, stored are their weight
         int[][] G = new int[n+1][n+1];
